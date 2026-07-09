@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
+import logoImage from "../assets/images/logo/logo.png";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,16 +13,24 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-[#8b4513] border-b border-gray-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0">
             <NavLink to="/" className="text-2xl font-bold text-indigo-600">
-              Sweet Crumbs Bakery
+              <img
+                src={logoImage}
+                alt="Bakery Brand Logo"
+                className="h-15 w-auto object-contain block"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  e.target.insertAdjacentHTML(
+                    "afterend",
+                    '<span class="text-base font-extrabold text-gray-900">BrandLogo</span>',
+                  );
+                }}
+              />
             </NavLink>
-            <p className="text-sm text-gray-500 tracking-wide cursor-pointer">
-              Freshly Baked with Love Every Day
-            </p>
           </div>
 
           <div className="hidden md:flex space-x-8">
@@ -29,7 +38,7 @@ export default function Navbar() {
               <NavLink
                 key={item.label}
                 to={item.href}
-                className="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                className="text-[#FFFDD0] hover:text-[#f59e0b] px-3 py-2 text-sm font-medium transition-colors duration-200"
               >
                 {item.label}
               </NavLink>
@@ -39,7 +48,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center">
             <NavLink
               to="/login"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
+              className="bg-[#f59e0b]  hover:bg-[#a8611d] text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
             >
               Login
             </NavLink>
@@ -49,7 +58,7 @@ export default function Navbar() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="text-gray-500 hover:text-indigo-600 p-2 rounded-md focus:outline-none"
+              className="text-[#f59e0b]  hover:text-[#a8611d] p-2 rounded-md focus:outline-none"
               aria-expanded={isOpen}
             >
               {isOpen ? (
@@ -94,7 +103,7 @@ export default function Navbar() {
             <NavLink
               key={item.label}
               to={item.href}
-              className="block text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 px-3 py-2 rounded-md text-base font-medium transition-colors"
+              className="block text-gray-600 hover:text-[#a8611d] hover:bg-indigo-50 px-3 py-2 rounded-md text-base font-medium transition-colors"
               onClick={() => setIsOpen(false)}
             >
               {item.label}
@@ -103,7 +112,7 @@ export default function Navbar() {
           <div className="pt-4 pb-2 border-t border-gray-200 px-3">
             <NavLink
               to="/login"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm text-center"
+              className="w-full bg-[#f59e0b]  hover:bg-[#a8611d]  text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm text-center"
             >
               Login
             </NavLink>

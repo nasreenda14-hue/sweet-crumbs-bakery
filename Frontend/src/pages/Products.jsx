@@ -1,11 +1,13 @@
-import React from 'react'
+import React from "react";
+import FeaturedProducts from "../components/FeaturedProducts";
 
 function Products() {
+  let title = "Our Products";
   return (
     <div>
-      <h1>Products page</h1>
+      <FeaturedProducts title={title} />
     </div>
-  )
+  );
 }
 
-export default Products
+export default Products;

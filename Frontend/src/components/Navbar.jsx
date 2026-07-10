@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import logoImage from "../assets/images/logo/logo.png";
+import logoImage from "../assets/images/logo/bakery-logo.png";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,11 +17,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex-shrink-0">
-            <NavLink to="/" className="text-2xl font-bold text-indigo-600">
+            <NavLink to="/" >
               <img
                 src={logoImage}
                 alt="Bakery Brand Logo"
-                className="h-15 w-auto object-contain block"
+                className="h-16 w-auto object-contain block"
                 onError={(e) => {
                   e.target.style.display = "none";
                   e.target.insertAdjacentHTML(
@@ -48,7 +48,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center">
             <NavLink
               to="/login"
-              className="bg-[#f59e0b]  hover:bg-[#a8611d] text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
+              className="bg-[#f59e0b] hover:bg-[#a8611d] text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm"
             >
               Login
             </NavLink>
@@ -58,7 +58,7 @@ export default function Navbar() {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="text-[#f59e0b]  hover:text-[#a8611d] p-2 rounded-md focus:outline-none"
+              className="text-[#f59e0b] hover:text-[#a8611d] p-2 rounded-md focus:outline-none"
               aria-expanded={isOpen}
             >
               {isOpen ? (

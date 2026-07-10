@@ -6,10 +6,12 @@ import Testimonials from "../components/Testimonial";
 import CallToAction from "../components/CallToAction";
 
 function Home() {
+  let title="Best Sellers"
+  
   return (
     <div>
       <Hero />
-      <FeaturedProducts />
+      <FeaturedProducts title={title} />
       <WhyChooseUs />
       <Testimonials />
       <CallToAction />

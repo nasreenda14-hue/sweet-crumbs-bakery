@@ -5,7 +5,7 @@ import croissant from "../assets/images/products/croissant.jpg";
 import muffin from "../assets/images/products/blueberry-muffin.jpg";
 import roll from "../assets/images/products/cinnamon-roll.jpg";
 
-export default function FeaturedProducts() {
+export default function FeaturedProducts(props) {
   const products = [
     {
       id: 1,
@@ -49,7 +49,7 @@ export default function FeaturedProducts() {
             Customer Favorites
           </span>
           <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-            Our Best Sellers
+            {props.title}
           </h2>
           <div className="w-16 h-1 bg-amber-500 mx-auto mt-4 rounded-full" />
         </div>

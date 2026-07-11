@@ -1,5 +1,5 @@
 import React from "react";
-import aboutImage from "../assets/images/background/background.jpg";
+import aboutImage from "../assets/images/background.jpg";
 
 export default function About() {
   return (

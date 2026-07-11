@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import logoImage from "../assets/images/logo/bakery-logo.png";
+import logoImage from "../assets/images/bakery-logo.png";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);

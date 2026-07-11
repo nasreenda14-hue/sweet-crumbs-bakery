@@ -1,5 +1,5 @@
 import React from "react";
-import logoImage from "../assets/images/logo/bakery-logo.png";
+import logoImage from "../assets/images/bakery-logo.png";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

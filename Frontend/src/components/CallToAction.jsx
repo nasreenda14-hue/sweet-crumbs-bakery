@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import backgroundImage from "../assets/images/background/background.jpg";
+import backgroundImage from "../assets/images/background.jpg";
 
 export default function CallToAction() {
   return (

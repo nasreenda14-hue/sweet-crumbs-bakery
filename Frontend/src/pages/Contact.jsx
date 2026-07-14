@@ -7,7 +7,7 @@ export default function ContactSection() {
     subject: "",
     message: "",
   });
-
+  const location = "123 Maple Street Springfield IL 62701 USA";
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -70,15 +70,14 @@ export default function ContactSection() {
                     />
                   </svg>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-200">
-                    Our Location
-                  </h4>
-                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">
-                    {" "}
-                    123 Maple Street Springfield,IL 62701 USA
-                  </p>
-                </div>
+                <a
+                  href={`https://www.google.com/maps?q=${encodeURIComponent(location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-400 mt-1 leading-relaxed hover:text-amber-400 transition-colors"
+                >
+                  📍 {location}
+                </a>
               </div>
 
               <div className="flex items-start gap-4">
@@ -108,10 +107,21 @@ export default function ContactSection() {
                     >
                       +1 (555) 123-4567
                     </a>
+                    <p className="text-xs text-gray-400 mt-1">
+                      <a
+                        href="https://wa.me/15551234567"
+                        target="_blank"
+                        className="hover:text-amber-400"
+                      >
+                        Chat on WhatsApp
+                      </a>
+                    </p>
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">
                     <a
-                      href="hello@sweetcrumbsbakery.com"
+                      href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@sweetcrumbsbakery.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="hover:text-amber-400 transition-colors"
                     >
                       hello@sweetcrumbsbakery.com

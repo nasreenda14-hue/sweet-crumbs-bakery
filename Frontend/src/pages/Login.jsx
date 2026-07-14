@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({
@@ -6,6 +8,8 @@ export default function LoginPage() {
     password: "",
     rememberMe: false,
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -15,10 +19,27 @@ export default function LoginPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login credentials loaded:", credentials);
-    alert("Welcome back to the Bakery!");
+    const { email, password } = credentials;
+    try {
+      const res = await axios.post("http://localhost:5000/api/v1/login", {
+        email,
+        password,
+      });
+
+      (localStorage.setItem("token", res.data.token),
+        localStorage.setItem("user", JSON.stringify(res.data.user)));
+      console.log(res.data);
+      navigate("/dashboard");
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          err.message ||
+          "Login failed",
+      );
+    }
   };
 
   return (
@@ -98,7 +119,7 @@ export default function LoginPage() {
               type="submit"
               className="w-full bg-[#c97a28] hover:bg-[#a8611d] text-white font-bold py-3.5 px-4 rounded-xl text-sm transition-all duration-200 shadow-md hover:shadow-amber-600/20 transform hover:-translate-y-0.5 text-center tracking-wide"
             >
-              Sign In
+              Login
             </button>
           </div>
         </form>

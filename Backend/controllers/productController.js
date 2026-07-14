@@ -2,14 +2,20 @@ import Product from "../models/Product.js";
 
 const createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const { name, price, description } = req.body;
+    const product = await Product.create({
+      name,
+      price,
+      description,
+      image: req.file ? req.file.path : "",
+    });
     res.status(201).json({
-      succes: true,
+      success: true,
       product,
     });
   } catch (error) {
     res.status(500).json({
-      succes: false,
+      success: false,
       message: error.message,
     });
   }
@@ -18,7 +24,7 @@ const createProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
   try {
     const products = await Product.find();
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       products,
     });
@@ -60,8 +66,16 @@ const updateProduct = async (req, res) => {
         message: "Product not found",
       });
     }
+    const updateData = {
+      name: req.body.name,
+      price: req.body.price,
+      description: req.body.description,
+    };
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
 
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    product = await Product.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });

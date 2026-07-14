@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const protect = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
 
@@ -13,6 +13,7 @@ const protect = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = decoded;
+
     next();
   } catch (error) {
     res.status(401).json({
@@ -22,4 +23,4 @@ const protect = (req, res, next) => {
   }
 };
 
-export default protect;
+export default authMiddleware;

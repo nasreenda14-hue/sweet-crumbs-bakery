@@ -48,7 +48,7 @@ export default function CallToAction() {
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
           <Link
-            to="/order"
+            to="/contact"
             className="w-full sm:w-auto bg-[#c97a28] hover:bg-[#a8611d] text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-gray-900/30 transition-all duration-200 transform hover:-translate-y-0.5 text-center text-sm tracking-wide"
           >
             Order Online Now

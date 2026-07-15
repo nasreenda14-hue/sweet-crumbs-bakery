@@ -23,11 +23,7 @@ export default function LoginPage() {
     e.preventDefault();
     const { email, password } = credentials;
     try {
-<<<<<<< HEAD
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/login`, {
-=======
-      const res = await axios.post("https://sweet-crumbs-bakery.onrender.com/api/v1/login", {
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
         email,
         password,
       });

@@ -51,21 +51,13 @@ function AddProduct() {
     formData.append("image", image);
     const token = localStorage.getItem("token");
     try {
-<<<<<<< HEAD
       await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/product`, formData, {
-=======
-      await axios.post("https://sweet-crumbs-bakery.onrender.com/api/v1/product", formData, {
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
-<<<<<<< HEAD
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/products`);
-=======
-      const res = await axios.get("https://sweet-crumbs-bakery.onrender.com/api/v1/products");
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
       console.log("API RESPONSE:", res.data);
       setProducts(res.data.product || res.data);
       setProduct({ name: "", price: "", description: "", image: "" });

@@ -6,11 +6,7 @@ function DashboardHome() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-<<<<<<< HEAD
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
-=======
-      const res = await axios.get("https://sweet-crumbs-bakery.onrender.com/api/v1/product");
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
       setProducts(res.data.products);
     };
     fetchProducts();

@@ -6,7 +6,7 @@ function DashboardHome() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await axios.get("http://localhost:5000/api/v1/product");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
       setProducts(res.data.products);
     };
     fetchProducts();

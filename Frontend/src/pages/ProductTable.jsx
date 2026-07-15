@@ -37,7 +37,7 @@ function ProductTable() {
       const id = products[index]._id;
 
       const res = await axios.put(
-        `http://localhost:5000/api/v1/product/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/v1/product/${id}`,
         editFormData,
         {
           headers: {
@@ -71,13 +71,13 @@ function ProductTable() {
       const id = products[deleteIndex]._id;
       console.log("DELETE ID:", id);
 
-      await axios.delete(`http://localhost:5000/api/v1/product/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/v1/product/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-      const res = await axios.get("http://localhost:5000/api/v1/product");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
       setProducts(res.data.products);
     } catch (err) {
       console.log("DELETE ERROR:", err.response?.data || err.message);
@@ -128,7 +128,7 @@ function ProductTable() {
                     <td className="p-4">
                       <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center shadow-inner mx-auto">
                         <img
-                          src={`http://localhost:5000/${p.image.replace(/\\/g, "/")}`}
+                          src={`${import.meta.env.VITE_API_URL}/${p.image.replace(/\\/g, "/")}`}
                           alt={p.name}
                           className="w-full h-full object-cover"
                         />

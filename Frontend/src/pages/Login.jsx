@@ -23,7 +23,7 @@ export default function LoginPage() {
     e.preventDefault();
     const { email, password } = credentials;
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/login", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/login`, {
         email,
         password,
       });

@@ -19,10 +19,10 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/v1/product")
+      .get("https://sweet-crumbs-bakery.onrender.comapi/v1/product")
       .then((res) => {
         console.log("API DATA:", res.data);
-        setProducts(res.data.product); // ✅ important
+        setProducts(res.data.product); 
       })
       .catch((err) => console.log(err));
   }, []);

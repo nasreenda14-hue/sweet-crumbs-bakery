@@ -32,7 +32,7 @@ export default function FeaturedProducts({ title, products = [], limit }) {
               >
                 <div className="relative aspect-[4/3] w-full bg-gray-100 overflow-hidden">
                   <img
-                    src={`http://localhost:5000/${product.image.replace(/\\/g, "/")}`}
+                    src={`https://sweet-crumbs-bakery.onrender.com/${product.image.replace(/\\/g, "/")}`}
                     alt={product.name}
                     className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300 ease-out"
                     loading="lazy"

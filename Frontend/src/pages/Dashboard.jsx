@@ -7,7 +7,7 @@ function Dashboard() {
   const [products, setProducts] = useState([]);
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/v1/product")
+      .get("https://sweet-crumbs-bakery.onrender.com/api/v1/product")
       .then((res) => {
         setProducts(res.data.products);
       })

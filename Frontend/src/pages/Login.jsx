@@ -23,7 +23,7 @@ export default function LoginPage() {
     e.preventDefault();
     const { email, password } = credentials;
     try {
-      const res = await axios.post("http://localhost:5000/api/v1/login", {
+      const res = await axios.post("https://sweet-crumbs-bakery.onrender.com/api/v1/login", {
         email,
         password,
       });

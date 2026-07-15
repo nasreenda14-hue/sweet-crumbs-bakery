@@ -6,7 +6,7 @@ function DashboardHome() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const res = await axios.get("http://localhost:5000/api/v1/product");
+      const res = await axios.get("https://sweet-crumbs-bakery.onrender.com/api/v1/product");
       setProducts(res.data.products);
     };
     fetchProducts();

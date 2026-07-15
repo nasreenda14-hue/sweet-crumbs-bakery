@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🍰 Sweet Crumbs Bakery
 
 A full-stack bakery website built using the MERN stack (MongoDB, Express.js, React.js, Node.js).
@@ -61,3 +62,18 @@ npm start
 Frontend: Vercel  
 Backend: Render  
 Database: MongoDB Atlas
+=======
+#  Sweet Crumbs Bakery
+
+Sweet Crumbs Bakery is a web application built with React and Vite. This project is currently in development and aims to create a simple and user-friendly online bakery experience.
+
+##  Tech Stack
+
+* React (Vite)
+* JavaScript
+* CSS
+
+##  Status
+
+This project is in the initial stage and will be updated with more features soon.
+>>>>>>> 448760d (Update API backend URL for production)

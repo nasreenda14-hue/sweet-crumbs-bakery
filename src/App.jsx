@@ -19,7 +19,7 @@ function App() {
 
   useEffect(() => {
     axios
-      .get("https://sweet-crumbs-bakery.onrender.comapi/v1/product")
+      .get(`${import.meta.env.VITE_API_URL}/api/v1/product`)
       .then((res) => {
         console.log("API DATA:", res.data);
         setProducts(res.data.product); 

@@ -73,6 +73,15 @@ Sweet Crumbs Bakery is a web application built with React and Vite. This project
 * JavaScript
 * CSS
 
+## 🚀 Live Demo
+
+🔗 https://sweet-crumbs-bakery-delta.vercel.app/
+
+## 📂 Repository
+
+🔗 https://github.com/nasreenda14-hue/sweet-crumbs-bakery
+
+
 ##  Status
 
 This project is in the initial stage and will be updated with more features soon.

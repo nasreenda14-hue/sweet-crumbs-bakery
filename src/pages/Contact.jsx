@@ -1,40 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 export default function ContactSection() {
+ const routerLocation = useLocation();
+
+const selectedProduct = routerLocation.state?.product || "";
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    subject: "",
+    phone: "",
+    product: "",
+    quantity:"",
     message: "",
   });
-  const location = "123 Maple Street Springfield IL 62701 USA";
+  useEffect(() => {
+  if (selectedProduct) {
+    setFormData((prev) => ({
+      ...prev,
+      product: selectedProduct,
+    }));
+  }
+}, [selectedProduct]);
+
+
+  const location1 = "123 Maple Street Springfield IL 62701 USA";
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submission data loaded:", formData);
-    alert("Thank you! Your message has been sent to our bakers.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    try{
+      const response=await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/orders`, formData)
+    console.log(response.data);
+    alert("Order Submitted successfully");
+    setFormData({ name: "", phone: "", product: "",quantity:"", message: "" });}
+    catch(error){
+      console.log("ERROR:", error.response?.data || error.message);
+      alert("Something went wrong")
+    }
   };
 
   return (
     <section className="bg-amber-50/20 py-16 sm:py-24 border-t border-gray-150">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-xl mx-auto mb-16">
-          <span className="text-amber-700 font-semibold text-xs tracking-wider uppercase bg-amber-100 px-3 py-1 rounded-full">
-            Get In Touch
-          </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-            Contact Our Bakery
-          </h2>
-          <p className="mt-4 text-gray-600 text-sm sm:text-base font-light leading-relaxed">
-            Have questions about custom catering, cake orders, or wholesale
-            ingredients? Drop us a line and we will get back to you shortly.
-          </p>
-        </div>
+       <div className="text-center max-w-xl mx-auto mb-16">
+  <span className="text-amber-700 font-semibold text-xs tracking-wider uppercase bg-amber-100 px-3 py-1 rounded-full">
+    Place Your Order
+  </span>
+
+  <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+    Order Fresh from Our Bakery
+  </h2>
+
+  <p className="mt-4 text-gray-600 text-sm sm:text-base font-light leading-relaxed">
+    Craving something sweet? Place your order for freshly baked cakes, pastries, and treats. Fill out the form below and we’ll prepare your order with care.
+  </p>
+</div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8 items-start">
           <div className="lg:col-span-1 space-y-8 bg-gray-900 text-white rounded-3xl p-8 shadow-xl">
@@ -76,7 +99,7 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   className="text-xs text-gray-400 mt-1 leading-relaxed hover:text-amber-400 transition-colors"
                 >
-                  📍 {location}
+                  📍 {location1}
                 </a>
               </div>
 
@@ -107,6 +130,7 @@ export default function ContactSection() {
                     >
                       +1 (555) 123-4567
                     </a>
+</p>
                     <p className="text-xs text-gray-400 mt-1">
                       <a
                         href="https://wa.me/15551234567"
@@ -115,7 +139,7 @@ export default function ContactSection() {
                       >
                         Chat on WhatsApp
                       </a>
-                    </p>
+                    
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">
                     <a
@@ -184,19 +208,19 @@ export default function ContactSection() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label
-                    htmlFor="email"
+                    htmlFor="phone"
                     className="text-xs font-bold text-gray-700 uppercase tracking-wider"
                   >
-                    Email Address
+                    Phone Number
                   </label>
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
+                    type="tel"
+                    id="phone"
+                    name="phone"
                     required
-                    value={formData.email}
+                    value={formData.phone}
                     onChange={handleChange}
-                    placeholder="john@example.com"
+                    placeholder="Enter your number"
                     className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 focus:bg-white transition-all duration-200"
                   />
                 </div>
@@ -204,22 +228,43 @@ export default function ContactSection() {
 
               <div className="flex flex-col gap-2">
                 <label
-                  htmlFor="subject"
+                  htmlFor="product"
                   className="text-xs font-bold text-gray-700 uppercase tracking-wider"
                 >
-                  Subject
+                  Product
                 </label>
                 <input
                   type="text"
-                  id="subject"
-                  name="subject"
+                  id="product"
+                  name="product"
                   required
-                  value={formData.subject}
+                  value={formData.product}
                   onChange={handleChange}
-                  placeholder="Custom wedding cake consultation..."
+                  placeholder="Enter Product you want"
                   className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 focus:bg-white transition-all duration-200"
                 />
               </div>
+             <div className="flex flex-col gap-2">
+  <label
+    htmlFor="quantity"
+    className="text-xs font-bold text-gray-700 uppercase tracking-wider"
+  >
+    Quantity
+  </label>
+
+  <input
+    type="number"
+    id="quantity"
+    name="quantity"
+    required
+    value={formData.quantity}
+    onChange={handleChange}
+    placeholder="Enter quantity"
+    min="1"
+    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 focus:bg-white transition-all duration-200"
+  />
+</div>
+              
 
               <div className="flex flex-col gap-2">
                 <label
@@ -245,7 +290,7 @@ export default function ContactSection() {
                   type="submit"
                   className="w-full sm:w-auto bg-[#c97a28] hover:bg-[#a8611d] text-white font-semibold px-8 py-3.5 rounded-xl shadow-md hover:shadow-amber-600/20 transition-all duration-200 transform hover:-translate-y-0.5 text-center text-sm tracking-wide"
                 >
-                  Send Message
+                  Submit  
                 </button>
               </div>
             </form>

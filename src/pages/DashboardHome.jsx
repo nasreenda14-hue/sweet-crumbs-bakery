@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import OrderTable from "../components/OrderTable";
+
 
 function DashboardHome() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
+
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
+
       setProducts(res.data.products);
     };
     fetchProducts();
@@ -18,6 +22,7 @@ function DashboardHome() {
       <div className=" text-amber-700 font-bold text-1xl mt-6 uppercase ">
         <h2>Total Product Items: {products.length} </h2>
       </div>
+     <OrderTable />
     </div>
   );
 }

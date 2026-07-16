@@ -51,13 +51,19 @@ function AddProduct() {
     formData.append("image", image);
     const token = localStorage.getItem("token");
     try {
+
       await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/product`, formData, {
+
+     
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
         },
       });
+
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/products`);
+
+    
       console.log("API RESPONSE:", res.data);
       setProducts(res.data.product || res.data);
       setProduct({ name: "", price: "", description: "", image: "" });

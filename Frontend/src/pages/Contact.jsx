@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 export default function ContactSection() {
+ const routerLocation = useLocation();
+
+const selectedProduct = routerLocation.state?.product || "";
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -9,7 +13,17 @@ export default function ContactSection() {
     quantity:"",
     message: "",
   });
-  const location = "123 Maple Street Springfield IL 62701 USA";
+  useEffect(() => {
+  if (selectedProduct) {
+    setFormData((prev) => ({
+      ...prev,
+      product: selectedProduct,
+    }));
+  }
+}, [selectedProduct]);
+
+
+  const location1 = "123 Maple Street Springfield IL 62701 USA";
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -85,7 +99,7 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   className="text-xs text-gray-400 mt-1 leading-relaxed hover:text-amber-400 transition-colors"
                 >
-                  📍 {location}
+                  📍 {location1}
                 </a>
               </div>
 

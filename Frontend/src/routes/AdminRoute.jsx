@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 const AdminRoute = ({ children }) => {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -9,6 +9,6 @@ const AdminRoute = ({ children }) => {
   if (user.role !== "admin") {
     return <Navigate to="/dashboard" />;
   }
-  return children;
+   return children;
 };
 export default AdminRoute;

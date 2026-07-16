@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -19,14 +19,10 @@ function App() {
 
   useEffect(() => {
     axios
-
       .get(`${import.meta.env.VITE_API_URL}/api/v1/product`)
-
-   
-
       .then((res) => {
         console.log("API DATA:", res.data);
-        setProducts(res.data.product); 
+        setProducts(res.data.product);
       })
       .catch((err) => console.log(err));
   }, []);
@@ -48,6 +44,8 @@ function App() {
             </AdminRoute>
           }
         >
+
+
           <Route path="dashboard-home" element={<DashboardHome />} />
           <Route path="add-product" element={<AddProduct />} />
           <Route path="product-table" element={<ProductTable />} />

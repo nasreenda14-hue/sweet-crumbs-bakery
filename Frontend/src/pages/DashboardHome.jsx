@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+
 function DashboardHome() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
-<<<<<<< HEAD
+
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
-=======
-      const res = await axios.get("https://sweet-crumbs-bakery.onrender.com/api/v1/product");
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
+
       setProducts(res.data.products);
     };
     fetchProducts();
@@ -22,6 +21,7 @@ function DashboardHome() {
       <div className=" text-amber-700 font-bold text-1xl mt-6 uppercase ">
         <h2>Total Product Items: {products.length} </h2>
       </div>
+     
     </div>
   );
 }

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    subject: "",
+    phone: "",
+    product: "",
+    quantity:"",
     message: "",
   });
   const location = "123 Maple Street Springfield IL 62701 USA";
@@ -13,11 +15,17 @@ export default function ContactSection() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submission data loaded:", formData);
-    alert("Thank you! Your message has been sent to our bakers.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    try{
+      const response=await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/orders`, formData)
+    console.log(response.data);
+    alert("Order Submitted successfully");
+    setFormData({ name: "", phone: "", product: "",quantity:"", message: "" });}
+    catch(error){
+      console.log("ERROR:", error.response?.data || error.message);
+      alert("Something went wrong")
+    }
   };
 
   return (
@@ -107,6 +115,7 @@ export default function ContactSection() {
                     >
                       +1 (555) 123-4567
                     </a>
+</p>
                     <p className="text-xs text-gray-400 mt-1">
                       <a
                         href="https://wa.me/15551234567"
@@ -115,7 +124,7 @@ export default function ContactSection() {
                       >
                         Chat on WhatsApp
                       </a>
-                    </p>
+                    
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">
                     <a
@@ -184,19 +193,19 @@ export default function ContactSection() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <label
-                    htmlFor="email"
+                    htmlFor="phone"
                     className="text-xs font-bold text-gray-700 uppercase tracking-wider"
                   >
-                    Email Address
+                    Phone Number
                   </label>
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
+                    type="tel"
+                    id="phone"
+                    name="phone"
                     required
-                    value={formData.email}
+                    value={formData.phone}
                     onChange={handleChange}
-                    placeholder="john@example.com"
+                    placeholder="Enter your number"
                     className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 focus:bg-white transition-all duration-200"
                   />
                 </div>
@@ -204,22 +213,43 @@ export default function ContactSection() {
 
               <div className="flex flex-col gap-2">
                 <label
-                  htmlFor="subject"
+                  htmlFor="product"
                   className="text-xs font-bold text-gray-700 uppercase tracking-wider"
                 >
-                  Subject
+                  Product
                 </label>
                 <input
                   type="text"
-                  id="subject"
-                  name="subject"
+                  id="product"
+                  name="product"
                   required
-                  value={formData.subject}
+                  value={formData.product}
                   onChange={handleChange}
-                  placeholder="Custom wedding cake consultation..."
+                  placeholder="Enter Product you want"
                   className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 focus:bg-white transition-all duration-200"
                 />
               </div>
+             <div className="flex flex-col gap-2">
+  <label
+    htmlFor="quantity"
+    className="text-xs font-bold text-gray-700 uppercase tracking-wider"
+  >
+    Quantity
+  </label>
+
+  <input
+    type="number"
+    id="quantity"
+    name="quantity"
+    required
+    value={formData.quantity}
+    onChange={handleChange}
+    placeholder="Enter quantity"
+    min="1"
+    className="w-full bg-gray-50 border border-gray-200 text-gray-900 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 focus:bg-white transition-all duration-200"
+  />
+</div>
+              
 
               <div className="flex flex-col gap-2">
                 <label
@@ -245,7 +275,7 @@ export default function ContactSection() {
                   type="submit"
                   className="w-full sm:w-auto bg-[#c97a28] hover:bg-[#a8611d] text-white font-semibold px-8 py-3.5 rounded-xl shadow-md hover:shadow-amber-600/20 transition-all duration-200 transform hover:-translate-y-0.5 text-center text-sm tracking-wide"
                 >
-                  Send Message
+                  Submit  
                 </button>
               </div>
             </form>

@@ -37,11 +37,10 @@ function ProductTable() {
       const id = products[index]._id;
 
       const res = await axios.put(
-<<<<<<< HEAD
+
         `${import.meta.env.VITE_API_URL}/api/v1/product/${id}`,
-=======
-        `https://sweet-crumbs-bakery.onrender.com/api/v1/product/${id}`,
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
+
+     
         editFormData,
         {
           headers: {
@@ -75,21 +74,17 @@ function ProductTable() {
       const id = products[deleteIndex]._id;
       console.log("DELETE ID:", id);
 
-<<<<<<< HEAD
+
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/v1/product/${id}`, {
-=======
-      await axios.delete(`https://sweet-crumbs-bakery.onrender.com/api/v1/product/${id}`, {
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
+
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-<<<<<<< HEAD
+
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
-=======
-      const res = await axios.get("https://sweet-crumbs-bakery.onrender.com/api/v1/product");
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
+
       setProducts(res.data.products);
     } catch (err) {
       console.log("DELETE ERROR:", err.response?.data || err.message);
@@ -140,11 +135,9 @@ function ProductTable() {
                     <td className="p-4">
                       <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center shadow-inner mx-auto">
                         <img
-<<<<<<< HEAD
+
                           src={`${import.meta.env.VITE_API_URL}/${p.image.replace(/\\/g, "/")}`}
-=======
-                          src={`https://sweet-crumbs-bakery.onrender.com/${p.image.replace(/\\/g, "/")}`}
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
+
                           alt={p.name}
                           className="w-full h-full object-cover"
                         />

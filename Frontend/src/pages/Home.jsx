@@ -11,11 +11,9 @@ function Home() {
 
   useEffect(() => {
     axios
-<<<<<<< HEAD
+
       .get(`${import.meta.env.VITE_API_URL}/api/v1/product`)
-=======
-      .get("https://sweet-crumbs-bakery.onrender.com/api/v1/product")
->>>>>>> b34c62be8969ef3892cefa19a2da184c4b370826
+
       .then((res) => {
         setProducts(res.data.products);
       })

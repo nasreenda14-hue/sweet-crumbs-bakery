@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import OrderTable from "../components/OrderTable";
 
 
 function DashboardHome() {
@@ -21,7 +22,7 @@ function DashboardHome() {
       <div className=" text-amber-700 font-bold text-1xl mt-6 uppercase ">
         <h2>Total Product Items: {products.length} </h2>
       </div>
-     
+     <OrderTable />
     </div>
   );
 }

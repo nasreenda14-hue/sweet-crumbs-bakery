@@ -37,4 +37,21 @@ const getAllOrders=async (req,res)=>{
     }
 }
 
-export {createOrder,getAllOrders}
+// PUT /api/orders/:id/status
+const updateStatus= async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    res.json(updatedOrder);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export {createOrder,getAllOrders,updateStatus}

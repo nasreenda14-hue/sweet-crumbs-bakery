@@ -5,7 +5,6 @@ const orderSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true],
-      unique: true,
     },
     phone: {
       type: String,
@@ -26,6 +25,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      enum: ["pending", "prepared", "delivered", "cancel"],
       default:"pending",
     },
   },

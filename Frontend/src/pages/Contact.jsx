@@ -31,18 +31,19 @@ export default function ContactSection() {
   return (
     <section className="bg-amber-50/20 py-16 sm:py-24 border-t border-gray-150">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-xl mx-auto mb-16">
-          <span className="text-amber-700 font-semibold text-xs tracking-wider uppercase bg-amber-100 px-3 py-1 rounded-full">
-            Get In Touch
-          </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-            Contact Our Bakery
-          </h2>
-          <p className="mt-4 text-gray-600 text-sm sm:text-base font-light leading-relaxed">
-            Have questions about custom catering, cake orders, or wholesale
-            ingredients? Drop us a line and we will get back to you shortly.
-          </p>
-        </div>
+       <div className="text-center max-w-xl mx-auto mb-16">
+  <span className="text-amber-700 font-semibold text-xs tracking-wider uppercase bg-amber-100 px-3 py-1 rounded-full">
+    Place Your Order
+  </span>
+
+  <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+    Order Fresh from Our Bakery
+  </h2>
+
+  <p className="mt-4 text-gray-600 text-sm sm:text-base font-light leading-relaxed">
+    Craving something sweet? Place your order for freshly baked cakes, pastries, and treats. Fill out the form below and we’ll prepare your order with care.
+  </p>
+</div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-8 items-start">
           <div className="lg:col-span-1 space-y-8 bg-gray-900 text-white rounded-3xl p-8 shadow-xl">

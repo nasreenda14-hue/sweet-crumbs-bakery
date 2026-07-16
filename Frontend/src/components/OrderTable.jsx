@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+
 function OrderTable() {
     const [orders, setOrders] = useState([]);
 
@@ -15,12 +16,18 @@ function OrderTable() {
   }, []);
   const handleStatusChange = async (id, status) => {
   try {
-    const res = await API.put(`${import.meta.env.VITE_API_URL}/api/v1/orders/${id}`, { status });
-
-    // update UI instantly
-    setOrders((prev) =>
-      prev.map((o) => (o._id === id ? res.data : o))
+    await axios.put(
+      `${import.meta.env.VITE_API_URL}/api/v1/orders/${id}/status`,
+      { status }
     );
+
+    
+    setOrders((prev) =>
+      prev.map((order) =>
+        order._id === id ? { ...order, status } : order
+      )
+    );
+
   } catch (err) {
     console.error(err);
   }

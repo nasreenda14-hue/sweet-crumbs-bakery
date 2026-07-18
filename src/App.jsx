@@ -44,7 +44,7 @@ function App() {
             </AdminRoute>
           }
         >
-
+          <Route index element={<Navigate to="dashboard-home" replace />} />
 
           <Route path="dashboard-home" element={<DashboardHome />} />
           <Route path="add-product" element={<AddProduct />} />

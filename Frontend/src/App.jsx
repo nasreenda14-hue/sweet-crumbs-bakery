@@ -13,6 +13,7 @@ import AddProduct from "./pages/AddProduct";
 import ProductTable from "./pages/ProductTable";
 import DashboardHome from "./pages/DashboardHome";
 import AdminRoute from "./routes/AdminRoute";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -39,9 +40,12 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <AdminRoute>
+            <ProtectedRoute>
+               <AdminRoute>
               <Dashboard />
             </AdminRoute>
+            </ProtectedRoute>
+           
           }
         >
           <Route index element={<Navigate to="dashboard-home" replace />} />

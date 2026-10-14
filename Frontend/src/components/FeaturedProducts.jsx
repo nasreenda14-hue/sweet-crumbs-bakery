@@ -47,7 +47,7 @@ export default function FeaturedProducts({ title, products = [], limit }) {
                       {product.name}
                     </h3>
                     <span className="text-[#c97a28] font-extrabold text-base whitespace-nowrap bg-amber-50 px-2.5 py-0.5 rounded-lg">
-                      {product.price}
+                      ₹{product.price}
                     </span>
                   </div>
 

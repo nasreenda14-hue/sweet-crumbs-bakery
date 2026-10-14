@@ -3,17 +3,21 @@ import Product from "../models/Product.js";
 const createProduct = async (req, res) => {
   try {
     const { name, price, description } = req.body;
+
     const product = await Product.create({
       name,
       price,
       description,
       image: req.file ? req.file.path : "",
     });
+
     res.status(201).json({
       success: true,
       product,
     });
   } catch (error) {
+    console.error("CREATE PRODUCT ERROR:", error);
+
     res.status(500).json({
       success: false,
       message: error.message,

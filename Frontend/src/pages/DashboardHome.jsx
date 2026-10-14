@@ -11,7 +11,7 @@ function DashboardHome() {
 
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
 
-      setProducts(res.data.products);
+      setProducts(res.data.product || []);
     };
     fetchProducts();
   }, []);

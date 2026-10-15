@@ -14,6 +14,7 @@ import ProductTable from "./pages/ProductTable";
 import DashboardHome from "./pages/DashboardHome";
 import AdminRoute from "./routes/AdminRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Order from "./pages/Order";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -35,6 +36,7 @@ function App() {
           <Route path="/products" element={<Products products={products} />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/order" element={<Order />} />
         </Route>
 
         <Route

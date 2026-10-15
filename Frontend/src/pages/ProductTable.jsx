@@ -1,261 +1,307 @@
-import React, { useState } from "react";
-import { useOutletContext } from "react-router-dom";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
-function ProductTable() {
-  const { products, setProducts } = useOutletContext();
+const API_URL = import.meta.env.VITE_API_URL;
 
+function ProductTable() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [editIndex, setEditIndex] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: "",
     price: "",
     description: "",
-    image: "",
   });
-
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
 
+  const fetchProducts = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await axios.get(`${API_URL}/api/v1/product`);
+      setProducts(
+        Array.isArray(res.data.products)
+          ? res.data.products
+          : Array.isArray(res.data.product)
+            ? res.data.product
+            : []
+      );
+    } catch (err) {
+      console.error("FETCH PRODUCTS ERROR:", err.response?.data || err.message);
+      setError("Unable to load products. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
   const handleEdit = (index) => {
-    const selectedProduct = products[index];
+    const product = products[index];
     setEditFormData({
-      name: selectedProduct.name,
-      price: selectedProduct.price,
-      description: selectedProduct.description,
-      image: selectedProduct.image,
+      name: product.name || "",
+      price: product.price ?? "",
+      description: product.description || "",
     });
     setEditIndex(index);
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditFormData((prev) => ({ ...prev, [name]: value }));
+    setEditFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSave = async (index) => {
     try {
-      const id = products[index]._id;
+      const product = products[index];
 
       const res = await axios.put(
-
-        `${import.meta.env.VITE_API_URL}/api/v1/product/${id}`,
-
-     
-        editFormData,
+        `${API_URL}/api/v1/product/${product._id}`,
+        {
+          ...editFormData,
+          price: Number(editFormData.price),
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        },
+        }
       );
 
-      const updatedProducts = products.map((item, i) =>
-        i === index ? res.data.product : item,
-      );
+      const updatedProduct = res.data.product || {
+        ...product,
+        ...editFormData,
+        price: Number(editFormData.price),
+      };
 
-      setProducts(updatedProducts);
+      setProducts((prev) =>
+        prev.map((item) =>
+          item._id === product._id ? updatedProduct : item
+        )
+      );
       setEditIndex(null);
     } catch (err) {
-      console.log(err);
+      console.error("UPDATE PRODUCT ERROR:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Unable to update product.");
     }
   };
 
-  const handleCancel = () => {
-    setEditIndex(null);
-  };
-
-  const triggerDeletePopup = (index) => {
-    setDeleteIndex(index);
-    setIsDeleteOpen(true);
-  };
-
   const executeDelete = async () => {
+    const product = products[deleteIndex];
+    if (!product) return;
+
     try {
-      const id = products[deleteIndex]._id;
-      console.log("DELETE ID:", id);
-
-
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/v1/product/${id}`, {
-
+      await axios.delete(`${API_URL}/api/v1/product/${product._id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
-
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/product`);
-
-      setProducts(res.data.products);
+      setProducts((prev) =>
+        prev.filter((item) => item._id !== product._id)
+      );
     } catch (err) {
-      console.log("DELETE ERROR:", err.response?.data || err.message);
+      console.error("DELETE PRODUCT ERROR:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Unable to delete product.");
+    } finally {
+      setIsDeleteOpen(false);
+      setDeleteIndex(null);
     }
-    setIsDeleteOpen(false);
-    setDeleteIndex(null);
   };
+
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden relative">
-      <div className="mb-6 pb-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4">
         <div>
-          <h2 className="text-xl font-extrabold text-gray-900 tracking-tight taxt-center">
-            Products
-          </h2>
+          <h2 className="text-xl font-extrabold text-gray-900">Products</h2>
+          <p className="mt-1 text-sm text-gray-500">
+            Total products: {products.length}
+          </p>
         </div>
+
+        <button
+          type="button"
+          onClick={fetchProducts}
+          className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+        >
+          Refresh
+        </button>
       </div>
 
-      <div className="overflow-x-auto w-full rounded-2xl border border-gray-100">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-amber-50/60 border-b border-gray-200 text-xs font-bold text-gray-700 uppercase tracking-wider">
-              <th className="p-4 w-20 text-center">Image</th>
-              <th className="p-4">Name</th>
-              <th className="p-4">Price</th>
-              <th className="p-4 hidden md:table-cell">Description</th>
-              <th className="p-4 text-right">Actions</th>
-            </tr>
-          </thead>
+      {error && (
+        <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
 
-          <tbody className="divide-y divide-gray-100 text-sm text-gray-600 bg-white">
-            {products.length === 0 ? (
-              <tr>
-                <td
-                  colSpan="5"
-                  className="p-10 text-center text-gray-400 font-light italic bg-gray-50/50"
-                >
-                  No items remain in your catalog registry.
-                </td>
+      {loading ? (
+        <p className="py-10 text-center text-gray-500">Loading products...</p>
+      ) : (
+        <div className="w-full overflow-x-auto rounded-2xl border border-gray-100">
+          <table className="w-full min-w-[700px] border-collapse text-left">
+            <thead>
+              <tr className="border-b bg-amber-50/60 text-xs uppercase text-gray-700">
+                <th className="p-4 text-center">Image</th>
+                <th className="p-4">Name</th>
+                <th className="p-4">Price</th>
+                <th className="p-4">Description</th>
+                <th className="p-4 text-right">Actions</th>
               </tr>
-            ) : (
-              products.map((p, index) => {
-                const isEditing = editIndex === index;
-                return (
-                  <tr
-                    key={p._id || index}
-                    className="hover:bg-amber-50/25 transition-colors duration-150"
-                  >
-                    <td className="p-4">
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex items-center justify-center shadow-inner mx-auto">
-                        <img
+            </thead>
 
-                          src={`${import.meta.env.VITE_API_URL}/${p.image.replace(/\\/g, "/")}`}
+            <tbody className="divide-y divide-gray-100 text-sm text-gray-600">
+              {products.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-10 text-center text-gray-400">
+                    No products found.
+                  </td>
+                </tr>
+              ) : (
+                products.map((product, index) => {
+                  const isEditing = editIndex === index;
+                  const imageUrl = product.image
+                    ? product.image.startsWith("http")
+                      ? product.image
+                      : `${API_URL}/${product.image
+                          .replace(/\\/g, "/")
+                          .replace(/^\/+/, "")}`
+                    : "";
 
-                          alt={p.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </td>
-                    <td className="p-4 font-bold text-gray-900 whitespace-nowrap">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="name"
-                          value={editFormData.name}
-                          onChange={handleInputChange}
-                          className="bg-gray-50 border border-amber-300 text-gray-900 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 w-full"
-                        />
-                      ) : (
-                        p.name
-                      )}
-                    </td>
-                    <td className="p-4 font-mono font-semibold text-amber-700 text-base">
-                      {isEditing ? (
-                        <div className="flex items-center gap-0.5">
-                          <span className="text-gray-400 text-sm font-sans">
-                            ₹
-                          </span>
+                  return (
+                    <tr key={product._id} className="hover:bg-amber-50/25">
+                      <td className="p-4">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border bg-gray-50">
+                          {imageUrl ? (
+                            <img
+                              src={imageUrl}
+                              alt={product.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-xs">No image</span>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="p-4 font-bold text-gray-900">
+                        {isEditing ? (
                           <input
-                            type="text"
+                            name="name"
+                            value={editFormData.name}
+                            onChange={handleInputChange}
+                            className="w-full rounded border p-2"
+                          />
+                        ) : (
+                          product.name
+                        )}
+                      </td>
+
+                      <td className="p-4 font-semibold text-amber-700">
+                        {isEditing ? (
+                          <input
                             name="price"
+                            type="number"
+                            min="0"
                             value={editFormData.price}
                             onChange={handleInputChange}
-                            className="bg-gray-50 border border-amber-300 text-amber-700 font-mono rounded-lg px-1.5 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 w-20 font-bold"
+                            className="w-24 rounded border p-2"
                           />
-                        </div>
-                      ) : (
-                        `₹${p.price}`
-                      )}
-                    </td>
-                    <td className="p-4 text-gray-500 font-light leading-relaxed max-w-xs hidden md:table-cell">
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          name="description"
-                          value={editFormData.description}
-                          onChange={handleInputChange}
-                          className="bg-gray-50 border border-amber-300 text-gray-900 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 w-full"
-                        />
-                      ) : (
-                        <p className="line-clamp-2" title={p.description}>
-                          {p.description}
-                        </p>
-                      )}
-                    </td>
-                    <td className="p-4 text-right space-x-2 whitespace-nowrap">
-                      {isEditing ? (
-                        <>
-                          <button
-                            onClick={() => handleSave(index)}
-                            className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1.5 rounded-xl text-xs transition-colors focus:outline-none shadow-sm"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={handleCancel}
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-3 py-1.5 rounded-xl text-xs transition-colors focus:outline-none"
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => handleEdit(index)}
-                            className="text-amber-600 hover:text-amber-800 font-semibold px-2 py-1 rounded-md text-xs transition-colors"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => triggerDeletePopup(index)}
-                            className="text-red-600 hover:text-red-800 font-semibold px-2 py-1 rounded-md text-xs transition-colors"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+                        ) : (
+                          `₹${product.price}`
+                        )}
+                      </td>
+
+                      <td className="max-w-xs p-4">
+                        {isEditing ? (
+                          <input
+                            name="description"
+                            value={editFormData.description}
+                            onChange={handleInputChange}
+                            className="w-full rounded border p-2"
+                          />
+                        ) : (
+                          product.description || "—"
+                        )}
+                      </td>
+
+                      <td className="space-x-2 whitespace-nowrap p-4 text-right">
+                        {isEditing ? (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleSave(index)}
+                              className="rounded-lg bg-amber-600 px-3 py-2 text-xs font-semibold text-white"
+                            >
+                              Save
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditIndex(null)}
+                              className="rounded-lg bg-gray-100 px-3 py-2 text-xs"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(index)}
+                              className="px-2 py-1 text-xs font-semibold text-amber-700"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDeleteIndex(index);
+                                setIsDeleteOpen(true);
+                              }}
+                              className="px-2 py-1 text-xs font-semibold text-red-600"
+                            >
+                              Delete
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {isDeleteOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white border border-gray-100 rounded-3xl p-6 max-w-sm w-full shadow-2xl scale-100 transition-transform">
-            <h3 className="text-lg font-extrabold text-gray-900 tracking-tight">
-              Delete Product?
-            </h3>
-            <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-              Are you sure you want to remove{" "}
-              <span className="font-bold text-gray-800">
-                "{products[deleteIndex]?.name}"
-              </span>
-              ? This catalog action cannot be undone.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-gray-900">Delete product?</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Delete "{products[deleteIndex]?.name}"? This cannot be undone.
             </p>
-            <div className="mt-6 flex justify-end space-x-2">
+            <div className="mt-6 flex justify-end gap-2">
               <button
+                type="button"
                 onClick={() => {
                   setIsDeleteOpen(false);
                   setDeleteIndex(null);
                 }}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold px-4 py-2 rounded-xl text-xs transition-colors"
+                className="rounded-lg bg-gray-100 px-4 py-2 text-sm"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={executeDelete}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-colors shadow-sm"
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white"
               >
                 Yes, Delete
               </button>

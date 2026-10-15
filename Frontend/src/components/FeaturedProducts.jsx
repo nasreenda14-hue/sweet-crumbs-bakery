@@ -56,10 +56,8 @@ export default function FeaturedProducts({ title, products = [], limit }) {
                   </p>
 
                   <Link
-  to="/contact"
-  state={{ product: product.name }}
-
-                    
+                    to="/order"
+                    state={{ product}}
                     className="w-full bg-[#c97a28] group-hover:bg-[#a8611d] text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
                   >
                     <span>Order Now</span>

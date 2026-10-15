@@ -29,7 +29,7 @@ const orderSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: true,
+      required: [true,"Address is required"],
       trim: true,
     },
     paymentMethod: {

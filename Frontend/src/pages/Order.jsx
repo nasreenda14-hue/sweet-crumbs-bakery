@@ -19,6 +19,7 @@ function Order() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [orderId, setOrderId] = useState("");
 
   // Return to products if no product was selected
   if (!product) {
@@ -45,85 +46,112 @@ function Order() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setSuccess("");
+    if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
+      setError("Please fill in your name, phone number, and delivery address.");
+      return;
+    }
 
-  if (
-    !form.name.trim() ||
-    !form.phone.trim() ||
-    !form.address.trim()
-  ) {
-    setError("Please fill in your name, phone number, and delivery address.");
-    return;
-  }
+    if (!/^[0-9+\-\s()]{7,20}$/.test(form.phone.trim())) {
+      setError("Please enter a valid phone number.");
+      return;
+    }
 
-  if (!/^[0-9+\-\s()]{7,20}$/.test(form.phone.trim())) {
-    setError("Please enter a valid phone number.");
-    return;
-  }
+    const productId = product._id || product.id;
 
-  const productId = product._id || product.id;
+    if (!productId) {
+      setError("Product ID is missing. Please select the product again.");
+      return;
+    }
 
-  if (!productId) {
-    setError("Product ID is missing. Please select the product again.");
-    return;
-  }
-
-  if (!Number.isInteger(Number(form.quantity)) ||
+    if (
+      !Number.isInteger(Number(form.quantity)) ||
       Number(form.quantity) < 1 ||
-      Number(form.quantity) > 100) {
-    setError("Quantity must be between 1 and 100.");
+      Number(form.quantity) > 100
+    ) {
+      setError("Quantity must be between 1 and 100.");
+      return;
+    }
+
+    if (paymentMethod !== "Cash on Delivery") {
+      setError(
+        "Online payment is not connected yet. Please select Cash on Delivery.",
+      );
+      return;
+    }
+
+     const token = localStorage.getItem("token");
+
+  if (!token) {
+    setError("Please log in before placing your order.");
+    navigate("/login");
     return;
   }
 
-  if (paymentMethod !== "Cash on Delivery") {
-    setError("Online payment is not connected yet. Please select Cash on Delivery.");
-    return;
-  }
+    setLoading(true);
 
-  setLoading(true);
+    try {
+      const orderData = {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        productId,
+        quantity: Number(form.quantity),
+        address: form.address.trim(),
+        message: form.message.trim(),
+        paymentMethod: "cod",
+      };
 
-  try {
-    const orderData = {
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      productId,
-      quantity: Number(form.quantity),
-      address: form.address.trim(),
-      message: form.message.trim(),
-      paymentMethod: "cod",
-    };
+      console.log("ORDER DATA:", orderData);
 
-    console.log("ORDER DATA:", orderData);
+      
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/api/v1/order`,
-      orderData
-    );
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/v1/order`,
+        orderData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-    console.log("ORDER CREATED:", response.data);
+      console.log("ORDER CREATED:", response.data);
+
+      const savedOrderId = response.data.order?._id;
+
+      if (!savedOrderId) {
+        setError(
+          "Order placed, but the Order ID could not be retrieved. Please contact us before placing another order.",
+        );
+        return;
+      }
+       setOrderId(savedOrderId);
     setSuccess("Your order was placed successfully!");
 
-    setForm({
-      name: "",
-      phone: "",
-      quantity: 1,
-      address: "",
-      message: "",
-    });
-  } catch (err) {
-    console.error("ORDER ERROR:", err.response?.data || err.message);
-    setError(
-      err.response?.data?.message ||
-      "Unable to place your order. Please try again."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+
+      
+
+      setForm({
+        name: "",
+        phone: "",
+        quantity: 1,
+        address: "",
+        message: "",
+      });
+    } catch (err) {
+      console.error("ORDER ERROR:", err.response?.data || err.message);
+      setError(
+        err.response?.data?.message ||
+          "Unable to place your order. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#fffaf4] px-4 py-12">
@@ -155,9 +183,7 @@ const handleSubmit = async (e) => {
             )}
 
             <h3 className="text-xl font-semibold">{product.name}</h3>
-            <p className="mt-2 text-gray-600">
-              Price: ₹{price.toFixed(2)}
-            </p>
+            <p className="mt-2 text-gray-600">Price: ₹{price.toFixed(2)}</p>
 
             <div className="mt-5 flex items-center justify-between border-t pt-4">
               <span className="font-semibold">Total</span>
@@ -249,7 +275,7 @@ const handleSubmit = async (e) => {
                 className="w-full rounded-lg border p-3 outline-none focus:border-amber-600"
               >
                 <option>Cash on Delivery</option>
-                <option>UPI / Online Payment (coming soon)</option>
+                <option>UPI / Online Payment</option>
               </select>
             </div>
 
@@ -260,9 +286,22 @@ const handleSubmit = async (e) => {
             )}
 
             {success && (
-              <p role="status" className="text-sm text-green-700">
-                {success}
-              </p>
+              <div
+                role="status"
+                className="rounded-lg border border-green-200 bg-green-50 p-4 text-green-800"
+              >
+                <p className="font-semibold">{success}</p>
+
+                <p className="mt-2 break-all text-sm">
+                  <span className="font-semibold">Your Order ID:</span>{" "}
+                  {orderId}
+                </p>
+
+                <p className="mt-2 text-sm">
+                  Please save this Order ID. You will need it to check your
+                  order status.
+                </p>
+              </div>
             )}
 
             <button
@@ -270,7 +309,9 @@ const handleSubmit = async (e) => {
               disabled={loading}
               className="w-full rounded-xl bg-[#c97a28] px-6 py-3 font-semibold text-white transition hover:bg-[#a8611d] disabled:opacity-60"
             >
-              {loading ? "Placing Order..." : `Place Order · ₹${total.toFixed(2)}`}
+              {loading
+                ? "Placing Order..."
+                : `Place Order · ₹${total.toFixed(2)}`}
             </button>
           </form>
         </div>

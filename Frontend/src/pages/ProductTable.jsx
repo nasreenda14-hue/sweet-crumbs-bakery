@@ -166,13 +166,16 @@ function ProductTable() {
               ) : (
                 products.map((product, index) => {
                   const isEditing = editIndex === index;
-                  const imageUrl = product.image
-                    ? product.image.startsWith("http")
-                      ? product.image
-                      : `${API_URL}/${product.image
-                          .replace(/\\/g, "/")
-                          .replace(/^\/+/, "")}`
-                    : "";
+                  
+const imageUrl = product.image
+  ? product.image.startsWith("http")
+    ? product.image
+    : `${API_URL}/uploads/${product.image
+        .replace(/\\/g, "/")
+        .split("/")
+        .pop()}`
+  : "";
+
 
                   return (
                     <tr key={product._id} className="hover:bg-amber-50/25">

@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 dotenv.config();
 
@@ -51,6 +52,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1", productRoutes);
 app.use("/api/v1/order", orderRoutes);
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/chat", chatRoutes);
 
 // Connect to MongoDB and start server
 const startServer = async () => {

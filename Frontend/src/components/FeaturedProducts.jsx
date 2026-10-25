@@ -1,86 +1,192 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-export default function FeaturedProducts({ title, products = [], limit }) {
-  const safeProducts = Array.isArray(products) ? products : [];
+function FeaturedProducts({ products: initialProducts }) {
+  const navigate = useNavigate();
 
-  const displayedProducts = limit ? safeProducts.slice(0, limit) : safeProducts;
+  const [products, setProducts] = useState(
+    Array.isArray(initialProducts) ? initialProducts : []
+  );
+  const [loading, setLoading] = useState(!Array.isArray(initialProducts));
+  const [error, setError] = useState("");
+
+  const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "https://sweet-crumbs-bakery.onrender.com";
+
+  useEffect(() => {
+    if (Array.isArray(initialProducts)) {
+      setProducts(initialProducts);
+      setLoading(false);
+      return;
+    }
+
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await axios.get(
+          `${API_URL}/api/v1/product`
+        );
+
+        const data = response.data;
+
+        const productList = Array.isArray(data)
+          ? data
+          : Array.isArray(data.products)
+            ? data.products
+            : Array.isArray(data.product)
+              ? data.product
+              : [];
+
+        setProducts(productList);
+      } catch (err) {
+        console.error(
+          "Fetch products error:",
+          err.response?.data || err.message
+        );
+
+        setError("Unable to load products. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [API_URL, initialProducts]);
+
+  const getImageUrl = (image) => {
+    if (!image) {
+      return "";
+    }
+
+    const normalizedImage = String(image)
+      .replace(/\\/g, "/")
+      .trim();
+
+    if (/^https?:\/\//i.test(normalizedImage)) {
+      return normalizedImage;
+    }
+
+    return `${API_URL.replace(/\/+$/, "")}/${normalizedImage.replace(
+      /^\/+/,
+      ""
+    )}`;
+  };
+
+  const handleOrderNow = (product) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login", {
+        state: {
+          from: "/order",
+          product,
+        },
+      });
+
+      return;
+    }
+
+    navigate("/order", {
+      state: {
+        product,
+      },
+    });
+  };
 
   return (
-    <section className="bg-white py-16 sm:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-xl mx-auto mb-12 sm:mb-16">
-          <span className="text-amber-600 font-semibold text-xs tracking-wider uppercase bg-amber-50 px-3 py-1 rounded-full">
+    <section className="bg-white px-4 py-12 sm:px-6 lg:px-12">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-10 text-center">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-700">
+            Freshly Baked With Love
+          </p>
+
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             Customer Favorites
-          </span>
-          <h2 className="mt-3 text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-            {title}
           </h2>
-          <div className="w-16 h-1 bg-amber-500 mx-auto mt-4 rounded-full" />
+
+          <p className="mx-auto mt-3 max-w-xl text-gray-600">
+            Discover delicious cakes and treats made especially for you.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {displayedProducts.length == 0 ? (
-            <p className="text-center col-span-4 text-gray-500">
-              No products added yet
-            </p>
-          ) : (
-            displayedProducts.map((product) => (
-              <div
-                key={product._id}
-                className="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div className="relative aspect-[4/3] w-full bg-gray-100 overflow-hidden">
-                  <img
-                    src={`https://sweet-crumbs-bakery.onrender.com/${product.image.replace(/\\/g, "/")}`}
-                    alt={product.name}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300 ease-out"
-                    loading="lazy"
-                  />
+        {loading && (
+          <p className="py-10 text-center text-gray-600">
+            Loading products...
+          </p>
+        )}
 
-                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {error && (
+          <p className="py-6 text-center text-red-600">
+            {error}
+          </p>
+        )}
+
+        {!loading && !error && products.length === 0 && (
+          <p className="py-10 text-center text-gray-600">
+            No products are available right now.
+          </p>
+        )}
+
+        {!loading && !error && products.length > 0 && (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {products.slice(0, 8).map((product) => (
+              <article
+                key={product._id || product.id}
+                className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                <div className="h-56 overflow-hidden bg-amber-50">
+                  {product.image ? (
+                    <img
+                      src={getImageUrl(product.image)}
+                      alt={product.name || "Bakery product"}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-gray-400">
+                      Image unavailable
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-col flex-1 p-5">
-                  <div className="flex justify-between items-start gap-2 mb-2">
-                    <h3 className="font-bold text-gray-900 text-lg group-hover:text-amber-600 transition-colors line-clamp-2">
-                      {product.name}
-                    </h3>
-                    <span className="text-[#c97a28] font-extrabold text-base whitespace-nowrap bg-amber-50 px-2.5 py-0.5 rounded-lg">
-                      ₹{product.price}
-                    </span>
-                  </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {product.name}
+                  </h3>
 
-                  <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-3 flex-1">
-                    {product.description}
+                  <p className="mt-2 min-h-12 text-sm leading-6 text-gray-600">
+                    {product.description || "Freshly prepared with care."}
                   </p>
 
-                  <Link
-                    to="/order"
-                    state={{ product}}
-                    className="w-full bg-[#c97a28] group-hover:bg-[#a8611d] text-white font-semibold py-2.5 px-4 rounded-xl text-sm transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2"
-                  >
-                    <span>Order Now</span>
-                    <svg
-                      className="w-4 h-4 transform translate-x-0 group-hover:translate-x-1 transition-transform"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <p className="text-xl font-bold text-amber-700">
+                      ₹{Number(product.price || 0).toLocaleString("en-IN")}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOrderNow(product)}
+                      className="rounded-lg bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </Link>
+                      Order Now
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
+
+export default FeaturedProducts;

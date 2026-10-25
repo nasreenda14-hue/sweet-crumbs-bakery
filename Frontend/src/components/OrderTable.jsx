@@ -13,25 +13,41 @@ function OrderTable() {
     setLoading(true);
     setError("");
 
-    try {
-      // Backend route: app.use("/api/v1/order", orderRoutes)
-      const res = await axios.get(`${API_URL}/api/v1/order`);
+   try {
+  const token = localStorage.getItem("token");
 
-      // Support either a direct array or { orders: [...] }
-      const data = Array.isArray(res.data)
-        ? res.data
-        : res.data.orders || [];
+  if (!token) {
+    throw new Error("Please log in again.");
+  }
 
-      setOrders(data);
-    } catch (err) {
-      console.error("FETCH ORDERS ERROR:", err.response?.data || err.message);
-      setError(
-        err.response?.data?.message ||
-          "Unable to load orders. Please try again."
-      );
-    } finally {
-      setLoading(false);
+  const response = await axios.get(
+    `${API_URL}/api/v1/order`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
+  );
+
+  const data = Array.isArray(response.data)
+    ? response.data
+    : response.data.orders || [];
+
+  setOrders(data);
+} catch (err) {
+  console.error(
+    "FETCH ORDERS ERROR:",
+    err.response?.data || err.message
+  );
+
+  setError(
+    err.response?.data?.message ||
+      err.message ||
+      "Unable to load orders. Please try again."
+  );
+} finally {
+  setLoading(false);
+}
   }, []);
 
   useEffect(() => {
@@ -42,10 +58,17 @@ function OrderTable() {
     try {
       setUpdatingId(id);
 
-      const res = await axios.put(
-        `${API_URL}/api/v1/order/${id}`,
-        { status }
-      );
+      const token = localStorage.getItem("token");
+
+const res = await axios.put(
+  `${API_URL}/api/v1/order/${id}`,
+  { status },
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       const updatedOrder = res.data.updatedOrder;
 

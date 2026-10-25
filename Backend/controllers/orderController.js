@@ -60,6 +60,7 @@ const createOrder = async (req, res) => {
           : "failed";
 
     const newOrder = await Order.create({
+      user: req.user.id,
       name: name.trim(),
       phone: phone.trim(),
       product: selectedProduct._id,
@@ -142,4 +143,80 @@ const updateStatus = async (req, res) => {
   }
 };
 
-export { createOrder, getAllOrders, updateStatus };
+
+const checkOrderStatus = async (req, res) => {
+  try {
+    const { orderId, phone } = req.body;
+
+    if (
+      typeof orderId !== "string" ||
+      typeof phone !== "string" ||
+      !orderId.trim() ||
+      !phone.trim()
+    ){
+      return res.status(400).json({
+        message: "Order ID and phone number are required",
+      });
+    }
+
+        const cleanOrderId = orderId.trim();
+
+    
+
+    if (!/^[a-f\d]{24}$/i.test(cleanOrderId)) {
+      return res.status(400).json({
+        message: "Please enter a valid order ID",
+      });
+    }
+
+    const order = await Order.findOne({
+      _id: cleanOrderId,
+      phone: phone.trim(),
+    }).populate("product", "name price image");
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found. Please check your order ID and phone number.",
+      });
+    }
+console.log("UPDATED CHECK STATUS FUNCTION:", order);
+    return res.status(200).json({
+  success: true,
+  orderId: order._id,
+  product: order.product,
+  quantity: order.quantity,
+  totalAmount: order.totalAmount,
+  paymentMethod: order.paymentMethod,
+  paymentStatus: order.paymentStatus,
+  status: order.status,
+  createdAt: order.createdAt,
+});
+  } catch (error) {
+    console.error("Check order status error:", error);
+
+    return res.status(500).json({
+      message: "Unable to check order status right now",
+    });
+  }
+};
+const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.user.id })
+      .populate("product", "name price image")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      orders,
+    });
+  } catch (error) {
+    console.error("Get my orders error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to retrieve your orders",
+    });
+  }
+};
+
+export { createOrder, getAllOrders, updateStatus, checkOrderStatus, getMyOrders };

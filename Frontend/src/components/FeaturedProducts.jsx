@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-function FeaturedProducts({ products: initialProducts }) {
+function FeaturedProducts({ products: initialProducts , limit = 4 }) {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState(
@@ -134,7 +134,7 @@ function FeaturedProducts({ products: initialProducts }) {
 
         {!loading && !error && products.length > 0 && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {products.slice(0, 8).map((product) => (
+            {(limit ?products.slice(0, limit): products).map((product) => (
               <article
                 key={product._id || product.id}
                 className="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"

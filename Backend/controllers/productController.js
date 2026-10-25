@@ -8,7 +8,7 @@ const createProduct = async (req, res) => {
       name,
       price,
       description,
-      image: req.file ? req.file.filename : "",
+      image: req.file ? req.file.path : "",
     });
 
     res.status(201).json({
@@ -76,7 +76,7 @@ const updateProduct = async (req, res) => {
       description: req.body.description,
     };
     if (req.file) {
-      updateData.image = req.file.filename;
+      updateData.image = req.file.path;
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, updateData, {

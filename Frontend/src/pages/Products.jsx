@@ -35,7 +35,7 @@ function Products() {
         />
       </div>
 
-      <FeaturedProducts title="Our Products" products={filteredProducts} />
+      <FeaturedProducts title="Our Products" products={filteredProducts} limit={0} />
     </div>
   );
 }

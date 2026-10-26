@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+import apiClient, { API_BASE_URL } from "../api/axios";
 
 function Order() {
   const location = useLocation();
@@ -109,8 +109,8 @@ function Order() {
 
       
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/order`,
+      const response = await apiClient.post(
+        "/api/v1/order",
         orderData,
         {
           headers: {
@@ -173,7 +173,7 @@ function Order() {
                 src={
                   product.image.startsWith("http")
                     ? product.image
-                    : `${import.meta.env.VITE_API_URL}/${product.image
+                    : `${API_BASE_URL}/${product.image
                         .replace(/\\/g, "/")
                         .replace(/^\/+/, "")}`
                 }

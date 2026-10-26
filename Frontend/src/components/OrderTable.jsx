@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import apiClient from "../api/axios";
 
 function OrderTable() {
   const [orders, setOrders] = useState([]);
@@ -20,8 +18,8 @@ function OrderTable() {
     throw new Error("Please log in again.");
   }
 
-  const response = await axios.get(
-    `${API_URL}/api/v1/order`,
+  const response = await apiClient.get(
+    "/api/v1/order",
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -60,8 +58,8 @@ function OrderTable() {
 
       const token = localStorage.getItem("token");
 
-const res = await axios.put(
-  `${API_URL}/api/v1/order/${id}`,
+const res = await apiClient.put(
+  `/api/v1/order/${id}`,
   { status },
   {
     headers: {

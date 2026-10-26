@@ -1,7 +1,5 @@
 import { useState } from "react";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+import apiClient, { API_BASE_URL } from "../api/axios";
 
 function getImageUrl(image) {
   if (!image) return "";
@@ -43,24 +41,10 @@ const sendMessage = async (event) => {
   setIsLoading(true);
 
   try {
-    const response = await fetch(
-      `${API_BASE_URL.replace(/\/$/, "")}/api/v1/chat`,
-      {
-        method: "POST",
-       headers: {
-  "Content-Type": "application/json",
-},
-        body: JSON.stringify({ message: text }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Unable to send your message."
-      );
-    }
+    const response = await apiClient.post("/api/v1/chat", {
+      message: text,
+    });
+    const data = response.data;
 
     setMessages((previous) => [
       ...previous,
@@ -75,7 +59,10 @@ const sendMessage = async (event) => {
       ...previous,
       {
         role: "bot",
-        text: error.message || "Sorry, I couldn't connect right now. Please try again.",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "Sorry, I couldn't connect right now. Please try again.",
       },
     ]);
 

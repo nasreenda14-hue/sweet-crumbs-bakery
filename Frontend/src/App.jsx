@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import axios from "axios";
+import apiClient from "./api/axios";
 
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -28,9 +28,7 @@ function App() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/v1/product`
-        );
+        const response = await apiClient.get("/api/v1/product");
 
         const data = response.data;
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import FeaturedProducts from "../components/FeaturedProducts";
-import axios from "axios";
+import apiClient from "../api/axios";
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -13,10 +13,8 @@ function Products() {
   });
 
   useEffect(() => {
-    axios
-
-      .get(`${import.meta.env.VITE_API_URL}/api/v1/product`)
-
+    apiClient
+      .get("/api/v1/product")
       .then((res) => {
         setProducts(res.data.products);
       })

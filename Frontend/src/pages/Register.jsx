@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import apiClient from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
 function Register() {
@@ -51,8 +51,8 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/auth/register`,
+      const response = await apiClient.post(
+        "/api/v1/auth/register",
         {
           name: form.name.trim(),
           email: form.email.trim().toLowerCase(),

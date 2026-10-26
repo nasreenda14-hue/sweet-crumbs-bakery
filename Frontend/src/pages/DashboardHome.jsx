@@ -1,9 +1,7 @@
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../api/axios";
 import OrderTable from "../components/OrderTable";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 function DashboardHome() {
   const [products, setProducts] = useState([]);
@@ -24,9 +22,9 @@ function DashboardHome() {
   }
 
   const [productRes, orderRes] = await Promise.all([
-    axios.get(`${API_URL}/api/v1/product`),
+    apiClient.get("/api/v1/product"),
 
-    axios.get(`${API_URL}/api/v1/order`, {
+    apiClient.get("/api/v1/order", {
       headers: {
         Authorization: `Bearer ${token}`,
       },

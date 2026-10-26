@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import apiClient, { API_BASE_URL } from "../api/axios";
 
 function ProductTable() {
   const [products, setProducts] = useState([]);
@@ -21,7 +19,7 @@ function ProductTable() {
     setError("");
 
     try {
-      const res = await axios.get(`${API_URL}/api/v1/product`);
+      const res = await apiClient.get("/api/v1/product");
       setProducts(
         Array.isArray(res.data.products)
           ? res.data.products
@@ -62,8 +60,8 @@ function ProductTable() {
     try {
       const product = products[index];
 
-      const res = await axios.put(
-        `${API_URL}/api/v1/product/${product._id}`,
+      const res = await apiClient.put(
+        `/api/v1/product/${product._id}`,
         {
           ...editFormData,
           price: Number(editFormData.price),
@@ -98,7 +96,7 @@ function ProductTable() {
     if (!product) return;
 
     try {
-      await axios.delete(`${API_URL}/api/v1/product/${product._id}`, {
+      await apiClient.delete(`/api/v1/product/${product._id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -170,7 +168,7 @@ function ProductTable() {
 const imageUrl = product.image
   ? product.image.startsWith("http")
     ? product.image
-    : `${API_URL}/uploads/${product.image
+    : `${API_BASE_URL}/uploads/${product.image
         .replace(/\\/g, "/")
         .split("/")
         .pop()}`

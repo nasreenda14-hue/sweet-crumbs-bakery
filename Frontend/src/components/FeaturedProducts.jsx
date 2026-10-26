@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient, { API_BASE_URL } from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
 function FeaturedProducts({ products: initialProducts , limit = 4 }) {
@@ -10,10 +10,6 @@ function FeaturedProducts({ products: initialProducts , limit = 4 }) {
   );
   const [loading, setLoading] = useState(!Array.isArray(initialProducts));
   const [error, setError] = useState("");
-
-  const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "https://sweet-crumbs-bakery.onrender.com";
 
   useEffect(() => {
     if (Array.isArray(initialProducts)) {
@@ -27,9 +23,7 @@ function FeaturedProducts({ products: initialProducts , limit = 4 }) {
         setLoading(true);
         setError("");
 
-        const response = await axios.get(
-          `${API_URL}/api/v1/product`
-        );
+        const response = await apiClient.get("/api/v1/product");
 
         const data = response.data;
 
@@ -55,7 +49,7 @@ function FeaturedProducts({ products: initialProducts , limit = 4 }) {
     };
 
     fetchProducts();
-  }, [API_URL, initialProducts]);
+  }, [initialProducts]);
 
   const getImageUrl = (image) => {
     if (!image) {
@@ -70,7 +64,7 @@ function FeaturedProducts({ products: initialProducts , limit = 4 }) {
       return normalizedImage;
     }
 
-    return `${API_URL.replace(/\/+$/, "")}/${normalizedImage.replace(
+    return `${API_BASE_URL}/${normalizedImage.replace(
       /^\/+/,
       ""
     )}`;

@@ -6,7 +6,7 @@ import adminMiddleware from "../middleware/adminMiddleware.js";
 const router = express.Router();
 
 router.post("/",authMiddleware, createOrder)
-router.post("/check-status", checkOrderStatus)
+router.post("/check-status",authMiddleware, checkOrderStatus)
 
 router.get("/my-orders", authMiddleware, getMyOrders);
 router.get("/",authMiddleware,adminMiddleware, getAllOrders)

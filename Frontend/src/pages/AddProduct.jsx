@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import axios from "axios";
+import apiClient from "../api/axios";
 
 function AddProduct() {
   const { products, setProducts } = useOutletContext();
@@ -66,8 +66,8 @@ function AddProduct() {
 
     try {
       // Create the product
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/product`,
+      const response = await apiClient.post(
+        "/api/v1/product",
         formData,
         {
           headers: {
@@ -79,9 +79,7 @@ function AddProduct() {
       console.log("PRODUCT CREATED:", response.data);
 
       // Refresh the product list using the correct endpoint
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/v1/product`
-      );
+      const res = await apiClient.get("/api/v1/product");
 
       const updatedProducts = res.data.products || [];
       setProducts(updatedProducts);

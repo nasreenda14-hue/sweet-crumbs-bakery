@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import apiClient from "../api/axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function Login() {
@@ -39,8 +39,8 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/auth/login`,
+      const response = await apiClient.post(
+        "/api/v1/auth/login",
         {
           email,
           password,

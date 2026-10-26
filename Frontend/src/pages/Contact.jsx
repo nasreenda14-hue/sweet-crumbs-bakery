@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../api/axios";
 import { useLocation } from "react-router-dom";
 
 export default function ContactSection() {
@@ -32,7 +32,7 @@ const selectedProduct = routerLocation.state?.product || "";
   const handleSubmit = async (e) => {
     e.preventDefault();
     try{
-      const response=await axios.post(`${import.meta.env.VITE_API_URL}/api/v1/orders`, formData)
+      const response = await apiClient.post("/api/v1/orders", formData);
     console.log(response.data);
     alert("Order Submitted successfully");
     setFormData({ name: "", phone: "", product: "",quantity:"", message: "" });}

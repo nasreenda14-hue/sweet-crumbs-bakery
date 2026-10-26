@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-
-const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+import apiClient, { API_BASE_URL } from "../api/axios";
 
 const getProductImageUrl = (image) => {
   if (!image) return "";
@@ -10,7 +8,7 @@ const getProductImageUrl = (image) => {
   const normalized = image.replace(/\\/g, "/");
   const filename = normalized.split("/").pop();
 
-  return filename ? `${API_URL}/uploads/${filename}` : "";
+  return filename ? `${API_BASE_URL}/uploads/${filename}` : "";
 };
 
 const getStatusStyle = (status) => {
@@ -56,8 +54,8 @@ function MyOrder() {
       }
 
       try {
-        const response = await axios.get(
-          `${API_URL}/api/v1/order/my-orders`,
+        const response = await apiClient.get(
+          "/api/v1/order/my-orders",
           {
             headers: {
               Authorization: `Bearer ${token}`,

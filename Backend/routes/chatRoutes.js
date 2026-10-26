@@ -4,6 +4,6 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/",authMiddleware, sendChatMessage);
+router.post("/", sendChatMessage);
 
 export default router;

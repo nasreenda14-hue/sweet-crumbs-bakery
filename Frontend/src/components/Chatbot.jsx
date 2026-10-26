@@ -32,18 +32,7 @@ const sendMessage = async (event) => {
 
   if (!text || isLoading) return;
 
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    setMessages((previous) => [
-      ...previous,
-      {
-        role: "bot",
-        text: "Please log in to your account to use the chatbot.",
-      },
-    ]);
-    return;
-  }
+ 
 
   setMessages((previous) => [
     ...previous,
@@ -58,10 +47,9 @@ const sendMessage = async (event) => {
       `${API_BASE_URL.replace(/\/$/, "")}/api/v1/chat`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+       headers: {
+  "Content-Type": "application/json",
+},
         body: JSON.stringify({ message: text }),
       }
     );

@@ -1,5 +1,5 @@
 import Product from "../models/Product.js";
-import Order from "../models/Order.js";
+
 
 const sendChatMessage = async (req, res) => {
   try {
@@ -40,92 +40,63 @@ const sendChatMessage = async (req, res) => {
 
     const result = await aiResponse.json();
     
-if (result.intent === "check_order_status") {
-  const order = await Order.findOne({
-    user: req.user.id,
-  })
-    .populate("product", "name")
-    .sort({ createdAt: -1 });
-
-  if (!order) {
-    return res.status(200).json({
-      success: true,
-      intent: "check_order_status",
-      reply:
-        "I couldn't find an order on your account. Please log in with the account you used to place your order.",
-    });
-  }
-
-  const statusMessages = {
-    pending: "Your order has been received and is awaiting preparation.",
-    prepared: "Your order is prepared and awaiting delivery.",
-    delivered: "Your order has been marked as delivered.",
-    cancel: "Your order has been cancelled.",
-  };
-
-  return res.status(200).json({
-    success: true,
-    intent: "check_order_status",
-    reply: `Your order for ${
-      order.product?.name || "your product"
-    }: ${
-      statusMessages[order.status] ||
-      "Please contact us for an update."
-    }`,
-    order: {
-      orderId: order._id,
-      status: order.status,
-    },
-  });
-}
-
-
-    // Retrieve real products from MongoDB when requested.
-   if (result.intent === "view_products") {
-  const messageLower = message.toLowerCase();
-
-  let filter = {};
-
-  if (
-    messageLower.includes("chocolate") ||
-    messageLower.includes("choco")
-  ) {
-    filter = {
-      $or: [
-        { name: { $regex: "chocolate", $options: "i" } },
-        { description: { $regex: "chocolate|choco", $options: "i" } },
-      ],}
+ if (result.intent === "check_order_status") {
+      return res.status(200).json({
+        success: true,
+        intent: "check_order_status",
+        reply:
+          "To check your order status, please visit your My Orders page.",
+      });
     }
-    else if (messageLower.includes("vanilla")) {
+
+
+   if (result.intent === "view_products") {
+      const messageLower = message.toLowerCase();
+      let filter = {};
+
+      if (
+        messageLower.includes("chocolate") ||
+        messageLower.includes("choco")
+      ) {
+        filter = {
+          $or: [
+            { name: { $regex: "chocolate|choco", $options: "i" } },
+            { description: { $regex: "chocolate|choco", $options: "i" } },
+          ],
+        };
+      } else if (messageLower.includes("vanilla")) {
         filter = {
           $or: [
             { name: { $regex: "vanilla", $options: "i" } },
             { description: { $regex: "vanilla", $options: "i" } },
-          ],}
-        } else if (messageLower.includes("birthday")) {
+          ],
+        };
+      } else if (messageLower.includes("birthday")) {
         filter = {
           $or: [
-            { name: { $regex: "birthday", $options: "i" } },
-            { description: { $regex: "birthday", $options: "i" } },
-          ],};
-  }
+            { name: { $regex: "birthday|celebration|party", $options: "i" } },
+            { description: { $regex: "birthday|celebration|party", $options: "i" } },
+          ],
+        };
+      }
 
-  const products = await Product.find(filter)
-    .select("name price description image")
-    .lean();
+      const products = await Product.find(filter)
+        .select("name price description image")
+        .lean();
 
-     const reply = products.length
+      const reply = products.length
         ? `I found ${products.length} product(s) for you!`
         : "Sorry, I couldn't find matching products. Try another cake type.";
 
-  return res.status(200).json({
-    success: true,
-    ...result,
-    reply,
-    products,
-  });
-}
+      return res.status(200).json({
+        success: true,
+        ...result,
+        reply,
+        products,
+      });
+    }
 
+    // Return the Python chatbot's response for other intents.
     return res.status(200).json({
       success: true,
       ...result,

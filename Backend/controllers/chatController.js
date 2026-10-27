@@ -4,7 +4,9 @@ const getFallbackResult = (message) => {
   const text = message.toLowerCase().trim();
 
   if (
-    /\b(order status|track my order|where is my order|check my order|has my order|when will my order arrive)\b/.test(text)
+    /\b(order status|track my order|where is my order|check my order|has my order|when will my order arrive)\b/.test(
+      text,
+    )
   ) {
     return {
       intent: "check_order_status",
@@ -21,7 +23,9 @@ const getFallbackResult = (message) => {
   }
 
   if (
-    /\b(hello|hi|hey|greetings|good morning|good afternoon|good evening)\b/.test(text)
+    /\b(hello|hi|hey|greetings|good morning|good afternoon|good evening)\b/.test(
+      text,
+    )
   ) {
     return {
       intent: "greeting",
@@ -31,7 +35,9 @@ const getFallbackResult = (message) => {
   }
 
   if (
-    /\b(cake|cakes|chocolate|choco|vanilla|birthday|product|products|menu|dessert|desserts|pastry|pastries)\b/.test(text)
+    /\b(cake|cakes|chocolate|choco|vanilla|birthday|product|products|menu|dessert|desserts|pastry|pastries)\b/.test(
+      text,
+    )
   ) {
     return {
       intent: "view_products",
@@ -45,7 +51,6 @@ const getFallbackResult = (message) => {
       "I can help you explore our cakes, ask about delivery, or find your My Orders page.",
   };
 };
-
 
 const sendChatMessage = async (req, res) => {
   try {
@@ -67,36 +72,27 @@ const sendChatMessage = async (req, res) => {
 
     const aiServiceUrl = process.env.AI_SERVICE_URL?.trim().replace(/\/+$/, "");
 
-    if (!aiServiceUrl) {
-      throw new Error("AI_SERVICE_URL is missing");
-    }
-
     let result;
-     try {
+    try {
       if (!aiServiceUrl) {
         throw new Error("AI_SERVICE_URL is not configured");
       }
 
-    
-
       // Send the message to  Python ML chatbot.
-      
-        const aiResponse = await fetch(`${aiServiceUrl}/chat`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: message.trim(),
-          }),
-          signal: AbortSignal.timeout(10000),
-        });
 
-        if (!aiResponse.ok) {
-          
+      const aiResponse = await fetch(`${aiServiceUrl}/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: message.trim(),
+        }),
+        signal: AbortSignal.timeout(10000),
+      });
+
+      if (!aiResponse.ok) {
         const errorBody = await aiResponse.text();
-          
-        
 
         console.error("Python AI HTTP error:", {
           status: aiResponse.status,
@@ -104,18 +100,13 @@ const sendChatMessage = async (req, res) => {
           attempt,
         });
 
-        throw new Error(
-          `Python AI service returned HTTP ${aiResponse.status}`
-        );
+        throw new Error(`Python AI service returned HTTP ${aiResponse.status}`);
       }
 
-          result = await aiResponse.json();
-      } catch (error) {
-      console.error(
-        "Python AI unavailable; using fallback:",
-        error.message
-      );
-       result = getFallbackResult(message);
+      result = await aiResponse.json();
+    } catch (error) {
+      console.error("Python AI unavailable; using fallback:", error.message);
+      result = getFallbackResult(message);
     }
 
     if (result.intent === "check_order_status") {
@@ -168,7 +159,7 @@ const sendChatMessage = async (req, res) => {
       return res.status(200).json({
         success: true,
         ...result,
-         reply: products.length
+        reply: products.length
           ? `I found ${products.length} product(s) for you!`
           : "Sorry, I couldn't find matching products. Try another cake type.",
         products,

@@ -1,5 +1,52 @@
 import Product from "../models/Product.js";
 
+const getFallbackResult = (message) => {
+  const text = message.toLowerCase().trim();
+
+  if (
+    /\b(order status|track my order|where is my order|check my order|has my order|when will my order arrive)\b/.test(text)
+  ) {
+    return {
+      intent: "check_order_status",
+      reply: "To check your order status, please visit your My Orders page.",
+    };
+  }
+
+  if (/\b(delivery|deliver|how long|how many days)\b/.test(text)) {
+    return {
+      intent: "delivery_time",
+      reply:
+        "Delivery time depends on your location and order. Please contact the bakery for a delivery estimate.",
+    };
+  }
+
+  if (
+    /\b(hello|hi|hey|greetings|good morning|good afternoon|good evening)\b/.test(text)
+  ) {
+    return {
+      intent: "greeting",
+      reply:
+        "Hello! Welcome to Sweet Crumbs Bakery. 🍰 How can I help you today?",
+    };
+  }
+
+  if (
+    /\b(cake|cakes|chocolate|choco|vanilla|birthday|product|products|menu|dessert|desserts|pastry|pastries)\b/.test(text)
+  ) {
+    return {
+      intent: "view_products",
+      reply: "Let me look for matching bakery products!",
+    };
+  }
+
+  return {
+    intent: "unknown",
+    reply:
+      "I can help you explore our cakes, ask about delivery, or find your My Orders page.",
+  };
+};
+
+
 const sendChatMessage = async (req, res) => {
   try {
     const { message } = req.body;
@@ -25,13 +72,15 @@ const sendChatMessage = async (req, res) => {
     }
 
     let result;
-    let lastError;
+     try {
+      if (!aiServiceUrl) {
+        throw new Error("AI_SERVICE_URL is not configured");
+      }
 
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      let shouldRetry = false;
+    
 
       // Send the message to  Python ML chatbot.
-      try {
+      
         const aiResponse = await fetch(`${aiServiceUrl}/chat`, {
           method: "POST",
           headers: {
@@ -40,50 +89,33 @@ const sendChatMessage = async (req, res) => {
           body: JSON.stringify({
             message: message.trim(),
           }),
-          signal: AbortSignal.timeout(20000),
+          signal: AbortSignal.timeout(10000),
         });
 
-        if (aiResponse.ok) {
-          result = await aiResponse.json();
-          break;
-        }
+        if (!aiResponse.ok) {
+          
         const errorBody = await aiResponse.text();
-
-        lastError = new Error(
-          `Python AI service returned HTTP ${aiResponse.status}`,
-        );
+          
+        
 
         console.error("Python AI HTTP error:", {
           status: aiResponse.status,
-          body: errorBody.slice(0, 500),
+          body: errorBody.slice(0, 300),
           attempt,
         });
 
-        shouldRetry = [502, 503, 504].includes(aiResponse.status);
+        throw new Error(
+          `Python AI service returned HTTP ${aiResponse.status}`
+        );
+      }
+
+          result = await aiResponse.json();
       } catch (error) {
-        lastError = error;
-
-        console.error("Python AI request error:", {
-          message: error.message,
-          attempt,
-        });
-
-        shouldRetry =
-          error.name === "TimeoutError" ||
-          error.name === "AbortError" ||
-          error instanceof TypeError;
-      }
-
-      if (!shouldRetry || attempt === 3) {
-        break;
-      }
-
-      console.log(`Retrying Python AI request after attempt ${attempt}...`);
-
-      await new Promise((resolve) => setTimeout(resolve, attempt * 4000));
-    }
-    if (!result) {
-      throw lastError || new Error("Python AI service returned no result");
+      console.error(
+        "Python AI unavailable; using fallback:",
+        error.message
+      );
+       result = getFallbackResult(message);
     }
 
     if (result.intent === "check_order_status") {
@@ -133,14 +165,12 @@ const sendChatMessage = async (req, res) => {
         .select("name price description image")
         .lean();
 
-      const reply = products.length
-        ? `I found ${products.length} product(s) for you!`
-        : "Sorry, I couldn't find matching products. Try another cake type.";
-
       return res.status(200).json({
         success: true,
         ...result,
-        reply,
+         reply: products.length
+          ? `I found ${products.length} product(s) for you!`
+          : "Sorry, I couldn't find matching products. Try another cake type.",
         products,
       });
     }
@@ -149,9 +179,10 @@ const sendChatMessage = async (req, res) => {
     return res.status(200).json({
       success: true,
       ...result,
+      products: [],
     });
   } catch (error) {
-    console.error("Chatbot error:", error.message);
+    console.error("Chatbot controller error:", error.message);
 
     return res.status(503).json({
       success: false,

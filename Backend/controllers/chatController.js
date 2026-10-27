@@ -1,6 +1,5 @@
 import Product from "../models/Product.js";
 
-
 const sendChatMessage = async (req, res) => {
   try {
     const { message } = req.body;
@@ -19,50 +18,83 @@ const sendChatMessage = async (req, res) => {
       });
     }
 
-    // Send the message to your Python ML chatbot.
-    const aiResponse = await fetch(
-      `${process.env.AI_SERVICE_URL}/chat`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: message.trim(),
-        }),
-        signal: AbortSignal.timeout(10000),
-      },
-    );
+    const aiServiceUrl = process.env.AI_SERVICE_URL?.trim().replace(/\/+$/, "");
 
-    
-if (!aiResponse.ok) {
-  const errorBody = await aiResponse.text();
+    if (!aiServiceUrl) {
+      throw new Error("AI_SERVICE_URL is missing");
+    }
 
-  console.error("Python AI HTTP error:", {
-    status: aiResponse.status,
-    statusText: aiResponse.statusText,
-    body: errorBody,
-  });
+    let result;
+    let lastError;
 
-  throw new Error(
-    `Python AI service returned HTTP ${aiResponse.status}`
-  );
-}
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      let shouldRetry = false;
 
+      // Send the message to  Python ML chatbot.
+      try {
+        const aiResponse = await fetch(`${aiServiceUrl}/chat`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            message: message.trim(),
+          }),
+          signal: AbortSignal.timeout(20000),
+        });
 
-    const result = await aiResponse.json();
-    
- if (result.intent === "check_order_status") {
+        if (aiResponse.ok) {
+          result = await aiResponse.json();
+          break;
+        }
+        const errorBody = await aiResponse.text();
+
+        lastError = new Error(
+          `Python AI service returned HTTP ${aiResponse.status}`,
+        );
+
+        console.error("Python AI HTTP error:", {
+          status: aiResponse.status,
+          body: errorBody.slice(0, 500),
+          attempt,
+        });
+
+        shouldRetry = [502, 503, 504].includes(aiResponse.status);
+      } catch (error) {
+        lastError = error;
+
+        console.error("Python AI request error:", {
+          message: error.message,
+          attempt,
+        });
+
+        shouldRetry =
+          error.name === "TimeoutError" ||
+          error.name === "AbortError" ||
+          error instanceof TypeError;
+      }
+
+      if (!shouldRetry || attempt === 3) {
+        break;
+      }
+
+      console.log(`Retrying Python AI request after attempt ${attempt}...`);
+
+      await new Promise((resolve) => setTimeout(resolve, attempt * 4000));
+    }
+    if (!result) {
+      throw lastError || new Error("Python AI service returned no result");
+    }
+
+    if (result.intent === "check_order_status") {
       return res.status(200).json({
         success: true,
         intent: "check_order_status",
-        reply:
-          "To check your order status, please visit your My Orders page.",
+        reply: "To check your order status, please visit your My Orders page.",
       });
     }
 
-
-   if (result.intent === "view_products") {
+    if (result.intent === "view_products") {
       const messageLower = message.toLowerCase();
       let filter = {};
 
@@ -87,7 +119,12 @@ if (!aiResponse.ok) {
         filter = {
           $or: [
             { name: { $regex: "birthday|celebration|party", $options: "i" } },
-            { description: { $regex: "birthday|celebration|party", $options: "i" } },
+            {
+              description: {
+                $regex: "birthday|celebration|party",
+                $options: "i",
+              },
+            },
           ],
         };
       }

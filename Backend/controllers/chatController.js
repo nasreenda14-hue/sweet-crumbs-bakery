@@ -34,9 +34,21 @@ const sendChatMessage = async (req, res) => {
       },
     );
 
-    if (!aiResponse.ok) {
-      throw new Error("Python AI service request failed");
-    }
+    
+if (!aiResponse.ok) {
+  const errorBody = await aiResponse.text();
+
+  console.error("Python AI HTTP error:", {
+    status: aiResponse.status,
+    statusText: aiResponse.statusText,
+    body: errorBody,
+  });
+
+  throw new Error(
+    `Python AI service returned HTTP ${aiResponse.status}`
+  );
+}
+
 
     const result = await aiResponse.json();
     
